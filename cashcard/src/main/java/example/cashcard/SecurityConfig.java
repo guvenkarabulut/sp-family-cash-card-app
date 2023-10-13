@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+
 @Configuration
 public class SecurityConfig {
 
@@ -24,24 +26,30 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public UserDetailsService testOnlyUsers(PasswordEncoder passwordEncoder) {
         User.UserBuilder users = User.builder();
         UserDetails sarah = users
                 .username("sarah1")
                 .password(passwordEncoder.encode("abc123"))
-                .roles("CARD-OWNER") // new role
+                .roles("CARD-OWNER")
                 .build();
         UserDetails hankOwnsNoCards = users
                 .username("hank-owns-no-cards")
                 .password(passwordEncoder.encode("qrs456"))
-                .roles("NON-OWNER") // new role
+                .roles("NON-OWNER")
                 .build();
-        return new InMemoryUserDetailsManager(sarah, hankOwnsNoCards);
+        UserDetails kumar = users
+                .username("kumar2")
+                .password(passwordEncoder.encode("xyz789"))
+                .roles("CARD-OWNER")
+                .build();
+        return new InMemoryUserDetailsManager(sarah, hankOwnsNoCards, kumar);
     }
-
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
 }
